@@ -1,39 +1,44 @@
 #include <iostream>
-#include <vector>
+#include <algorithm>
 #include <queue>
-#include <tuple>
+#include <vector>
 
 using namespace std;
+#define INF 1000000000
 
-int n,m,r;
-priority_queue<tuple<int,int,int>,vector<tuple<int,int,int>>,greater<tuple<int,int,int>>>pq;
-bool visited[101];
-vector<tuple<int,int,int>>v[101];
-int ans[101];
-int item[101];
-vector<int> maxi;
-//pq: value, node, item
+int ans;
+int n,m,r,a,b,l;
+int local[101];
+int d[101];
+vector<pair<int,int>>v[101];
 
-void reset(){
-  for(int i = 0; i < n; i++){
-    ans[i] = 2e9;
+void dijkstra(int start){
+  int cnt = 0; 
+  queue<int>q;
+  for(int i = 1; i<= n; i++){
+    d[i] = INF;
   }
-  while(!pq.empty()) pq.pop();
-}
+  d[start] = 0;
+  q.push(start);
 
-int dijkstra(){
-  for(int i = 0; i < n; i++){
-    pq.push({0, i, item[i]});
-    while(!pq.empty()){
-      int value, node, its;
-      tie(value, node, its) = pq.top();
-      pq.pop();
+  while(!q.empty()){
+    int node = q.front();
+    int dist = d[node];
+    q.pop();
 
-      if(visited[node]) continue;
-      visited[node] = true;
-      if()
+    for(int i = 0; i < v[node].size(); i++){
+      int next = v[node][i].first;
+      int nextDist = v[node][i].second;
+
+      if(d[next] > dist + nextDist){
+        d[next] = dist + nextDist;
+        q.push(next);
+      }
     }
   }
+  for(int i = 1; i <= n; i++) if(d[i] <= m) cnt += local[i];
+  
+  ans = max(ans,cnt);
 }
 
 int main(){
@@ -41,5 +46,16 @@ int main(){
   cin.tie(nullptr);
   cout.tie(nullptr);
 
-
+  cin>>n>>m>>r;
+  for(int i = 1; i <= n;i++) cin>>local[i];
+  for(int i = 0; i < r; i++){
+    cin>>a>>b>>l;
+    v[a].push_back({b,l});
+    v[b].push_back({a,l});
+  }
+  for(int i = 1; i <= n; i++){
+    dijkstra(i);
+  }
+  cout<<ans;
+  return 0;
 }
