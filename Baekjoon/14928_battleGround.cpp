@@ -15,7 +15,8 @@ vector<pair<int,int>>v[101];
 void dijkstra(int start){
   int cnt = 0; 
   queue<int>q;
-  for(int i = 1; i<= n; i++){
+  for(int i = 1
+  ; i<= n; i++){
     d[i] = INF;
   }
   d[start] = 0;
