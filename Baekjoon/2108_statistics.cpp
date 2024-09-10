@@ -1,39 +1,45 @@
-#include <cstdio>
-#include <cstdlib>
 #include <iostream>
-#include <string>
 #include <vector>
 #include <algorithm>
-#include <queue>
-#include <math.h>
-#include <tuple>
-#include <unordered_map>
-#include <unordered_set>
-#include <stack>
-#include <sstream>
+#include <cmath>
 
 using namespace std;
-using ll = long long;
 
+vector<int>nums, modes;
+int cnt[8001];
+int N, modeCnt;
+double sum;
 
-
-int main() {
+int main(){
   ios::sync_with_stdio(false);
   cin.tie(nullptr);
   cout.tie(nullptr);
-  
-  int n;
-  int sum = 0;
-  cin>>n;
-  vector<int>v(n);
 
-  for(int i = 0; i < n; i++){
-    int a;
-    cin>>a;
-    v.push_back(a);
-    sum += a;
+  cin>>N;
+  nums = vector<int>(N);
+  modes.reserve(N);
+
+  for(int &num : nums){
+    cin>>num;
+    sum += num;
+    cnt[num+4000]++;
   }
-  cout<<round()
+  
+  sort(nums.begin(), nums.end());
 
+  for(int i = 0 ; i < 8001; i++){
+    if(cnt[i] > modeCnt){
+      modes.clear();
+      modeCnt = cnt[i];
+      modes.push_back(i-4000);
+    }
+    else if(cnt[i] == modeCnt){
+      modes.push_back(i-4000);
+    }
+  }
 
+  cout<<round(sum/N)+0.0<<"\n";
+  cout<<nums[N/2]<<"\n";
+  cout<<(modes.size() == 1 ? modes.front() : modes[1])<<"\n";
+  cout<<nums.back() - nums.front();
 }
