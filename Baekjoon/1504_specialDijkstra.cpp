@@ -25,7 +25,7 @@ int dijkstra(int start, int end){
     pq.pop();
 
     if(visited[node]) continue;
-    visited[node];
+    visited[node] = true;
 
     if(node == end) return ans[node];
 
@@ -57,13 +57,20 @@ int main(){
   }
   cin>>v1>>v2;
 
-  int s_to_v12 = min(dijkstra(1,v1), dijkstra(1, v2));
+  int s_to_v1 = dijkstra(1, v1);
+  int s_to_v2 = dijkstra(1, v2);
   int v1_to_v2 = dijkstra(v1, v2);
-  int v12_to_e = min(dijkstra(v1, e), dijkstra(v2, e));
+  int v1_to_e = dijkstra(v1, n);
+  int v2_to_e = dijkstra(v2, n);
 
-  if(s_to_v12 == INF || v1_to_v2 == INF || v12_to_e == INF){
-    cout<<-1;
-    return 0;
-  }
-  else cout<<s_to_v12+v1_to_v2+v12_to_e;
+  int case1 = s_to_v1 + v1_to_v2 + v2_to_e;
+  int case2 = s_to_v2 + v1_to_v2 + v1_to_e;
+  int temp = INF;
+
+  if(s_to_v1 != INF && v1_to_v2 != INF && v2_to_e != INF) temp = min(temp, case1);
+  if(s_to_v2 != INF && v1_to_v2 != INF && v1_to_e != INF) temp = min(temp, case2);
+  if(temp == INF) cout<<-1;
+  else cout<<temp;
+
+  return 0;
 }
