@@ -85,26 +85,9 @@ int main(){
   }
 
   int testCase = combination(zero, 3);
-  int t = 0;
+  
 
-  while(testCase--){
-      while(true){
-        for(int i = 0; i < n; i++){
-          for(int j = 0; j < m; j++){
-            if(postMiro[i][j] == 0){
-              postMiro[i][j] =1;
-              t++;
-              if(postMiro[i][j] == 3){
-                postMiro[i][j] = 0;
-                t--;
-                safeRegion.push_back(bfs());
-                reset();
-              }
-            }
-          }
-        }
-    }
-  }
+  
   
   sort(safeRegion.begin(), safeRegion.end());
   cout<<safeRegion[0];
