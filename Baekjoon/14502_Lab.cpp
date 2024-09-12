@@ -2,7 +2,10 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <vector>
+
 using namespace std;
+using ll = long long;
 
 int n, m;
 int zero = 0;
@@ -24,9 +27,9 @@ void reset(){
     for(int j = 0; j < m; j++){
       visited[i][j] = false;
       postMiro[i][j] = miro[i][j];
+      if(miro[i][j] == 2) q.push({i,j});
     }
   }
-  while(!q.empty()) q.pop();
 }
 
 int bfs(){
@@ -35,6 +38,7 @@ int bfs(){
   while(!q.empty()){
     int x = q.front().first;
     int y = q.front().second;
+    visited[x][y] = true;
     q.pop();
     size++;
 
@@ -42,26 +46,13 @@ int bfs(){
       int nx = x + dx[i];
       int ny = y + dy[i];
 
-      if(isInside(nx, ny) && !visited[nx][ny] && miro[nx][ny] != 1){
+      if(isInside(nx, ny) && !visited[nx][ny] && postMiro[nx][ny] != 1){
         q.push({nx, ny});
         visited[nx][ny] = true;
       }
     }
   }
   return ((n*m) - size);
-}
-
-int factorial(int a){
-  if(a == 1){
-    return 1;
-  }
-  else{
-    return a * factorial(a-1);
-  }
-}
-
-int combination(int a, int b){
-  return (factorial(a) / (factorial(a-b) * factorial(b)));
 }
 
 int main(){
@@ -84,10 +75,25 @@ int main(){
     }
   }
 
-  int testCase = combination(zero, 3);
-  
+  int total = n*m;
+  for(int i = 0; i < total - 2; i++){
+    if(postMiro[i/m][i%m] != 0)continue;
 
-  
+    for(int j = i+1; j < total - 1; j++){
+      if(postMiro[j/m][j%m] != 0) continue;
+
+      postMiro[i/m][i%m] = 1;
+      postMiro[j/m][j%m] = 1;
+
+      for(int k = j + 1; k < total; k++){
+        if(postMiro[j/m][j%m] != 0) continue;
+
+        postMiro[k/m][k%m] = 1;
+        safeRegion.push_back(bfs());
+        reset();
+      }
+    }
+  }
   
   sort(safeRegion.begin(), safeRegion.end());
   cout<<safeRegion[0];
