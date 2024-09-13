@@ -1,15 +1,51 @@
 #include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
+#include <limits>
 
 using namespace std;
 
-int n,m;
-priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
-vector<pair<int,int>>v[10001];
-bool visited[202];
-char ans[202][202];
+int n,m,miro[201][201], inf = 9e8, nextNode[201][201];
+
+void initialize(){
+  for(int i = 1; i <= n; i++){
+    for(int j = 1; j <= n; j++){
+      if(i == j)miro[i][j] = 0;
+      else miro[i][j] = inf;
+    }
+  }
+}
+
+void inputNode(){
+  while(m--){
+    int a,b,c;
+    cin>>a>>b>>c;
+    miro[a][b] = miro[b][a] = c;
+    nextNode[a][b] = b;
+    nextNode[b][a] = a;
+  }
+}
+
+void floydWarshall(){
+  for(int k = 1; k <= n; k++){
+    for(int i = 1; i <= n; i++){
+      for(int j = 1; j <= n; j++){
+        if(miro[i][j] > miro[i][k] + miro[k][j]){
+          miro[i][j] = miro[i][k] + miro[k][j];
+          if(i != k) nextNode[i][j] = nextNode[i][k];
+        }
+      }
+    }
+  }
+}
+
+void printPath(){
+  for(int i = 1; i <= n; i++){
+    for(int j = 1; j <= n; j++){
+      if(i == j) cout<<"- ";
+      else cout<<nextNode[i][j]<<" ";
+    }
+    cout<<"\n";
+  }
+}
 
 int main(){
   ios::sync_with_stdio(false);
@@ -17,12 +53,9 @@ int main(){
   cout.tie(nullptr);
 
   cin>>n>>m;
-  for(int i = 1; i <= n; i++){
-    int a,b,c;
-    cin>>a>>b>>c;
-    v[a].push_back({c,b});
-    v[b].push_back({c,a});
-  }
-
-  
+  initialize();
+  inputNode();
+  floydWarshall();
+  printPath();
+  return 0;
 }
