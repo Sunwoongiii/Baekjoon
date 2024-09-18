@@ -7,6 +7,9 @@ using namespace std;
 int n,m;
 int miro[303][303][11];
 bool visited[303][303];
+int dx[4] = {0,0,1,-1};
+int dy[4] = {1,-1,0,0};
+queue<pair<int,int>>q;
 
 int bfs();
 
@@ -22,4 +25,8 @@ int main(){
       cin>>miro[i][j][0];
     }
   }
+}
+
+int bfs(){
+
 }
