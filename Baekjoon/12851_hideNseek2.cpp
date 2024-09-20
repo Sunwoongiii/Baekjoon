@@ -45,4 +45,6 @@ int main(){
 
   cin>>n>>k;
   cout<<dijkstra()<<"\n";
+  
+  return 0;
 }

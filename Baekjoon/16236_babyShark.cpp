@@ -13,7 +13,7 @@ bool visited[22][22];
 queue<pair<int,int>>q;
 vector<pair<int,int>>dist;//거리, 덩치
 
-bool isInsied(int x, int y){
+bool isInside(int x, int y){
   return (x >= 0 && y >= 0 && x < n && y < n);
 }
 
