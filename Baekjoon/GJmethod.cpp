@@ -1,16 +1,19 @@
 #include <iostream>
-
 using namespace std;
 
-int matrix[101][101];
+int n;
 
 int main(){
-  int n;
   cin>>n;
+  int arr[n+1][n+1] = {0};
+  int mid = (1 + n)/2, int sum = mid * 3;
+  arr[mid][mid] = mid;
 
-  for(int i = 1; i <= n;i++){
-    for(int j= =1; j <= n; j++){
-      cin>>matrix[i][j];
+  for(int i = 1; i <= n*n; i++){
+    for(int j = 1; j <= n; j++){
+      for(int k = 1; k <= n; k++){
+        
+      }
     }
   }
 }
