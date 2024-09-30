@@ -1,21 +1,24 @@
 #include <iostream>
 using namespace std;
-
+using ll = long long;
 int n,m,i,j;
-int arr[101001];
+ll arr[100100];
+
 
 int main(){
   ios::sync_with_stdio(false);
   cin.tie(nullptr);
   cout.tie(nullptr);
-  
+
   cin>>n>>m;
-  for(int i = 1; i <= n; i++) cin>>arr[i];
+  for(int i = 1; i <= n; i++){
+    int x;
+    cin>>x;
+    arr[i] = arr[i-1] + x;
+  }
 
   while(m--){
     cin>>i>>j;
-    int sum = 0;
-    for(int k = i; k <= j; k++) sum+=arr[k];
-    cout<<sum<<"\n";
+    cout<<arr[j]-arr[i-1]<<"\n";
   }
 }
