@@ -1,37 +1,40 @@
 #include <iostream>
 #include <deque>
-#include <vector>
-#include <climits>
+#include <algorithm>
 using namespace std;
 
-int n,m,startX,startY,endX,endY;
-char miro[110][110];
-int ans[110][110];
-bool visited[110][110][4];
+int n,m;
+char MAP[101][101];
+int Mirror[101][101][4];
 int dx[4] = {0,0,-1,1};
 int dy[4] = {-1,1,0,0};
+int startX,startY,endX,endY;
 
-class State{
-public:
-  int x,y,dir,changed;
-};
+void init(){
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < m; j++){
+      for(int k = 0; k < 4; k++){
+        Mirror[i][j][k] = 1e9;
+      }
+    }
+  }
+}
 
 void getInput(){
-  cin>>n>>m;\
+  cin>>n>>m;
   int cnt = 0;
   for(int i = 0; i < n; i++){
     for(int j = 0; j < m; j++){
-      cin>>miro[i][j];
-      if(miro[i][j] == 'C' && cnt == 0){
-        startX = i;
-        startY = j;
+      cin>>MAP[i][j];
+      if(MAP[i][j] == 'C' && cnt == 0){
         cnt++;
+        startX=i;
+        startY=j;
       }
-      if(miro[i][j] == 'C' && cnt == 1){
-        endX = i;
-        endY = j;
+      else if(MAP[i][j] == 'C' && cnt == 1){
+        endX=i;
+        endY=j;
       }
-      ans[i][j] = 1e9;
     }
   }
 }
@@ -41,38 +44,50 @@ bool isInside(int a, int b){
 }
 
 int bfs(){
-  deque<State>dq;
+  deque<pair<int,pair<int,int>>>dq;
 
   for(int i = 0; i < 4; i++){
-    dq.push_back({startX, startY, i, 0});
-    visited[startX][startY][i] = true;
-    ans[startX][startY] = 0;
+    dq.push_back({0,{startX,startY}});
+    Mirror[startX][startY][i] = 0;
   }
 
   while(!dq.empty()){
-    State cur =dq.front();
+    auto[curMirrors, pos] = dq.front();
+    int x = pos.first;
+    int y = pos.second;
     dq.pop_front();
 
-    for(int d = 0; d < 4; d++){
-      int nx = cur.x + dx[d];
-      int ny = cur.y + dy[d];
-      int nextChange = cur.changed + (cur.dir != d);
+    for(int i = 0; i < 4; i++){
+      int nx = x + dx[i];
+      int ny = y + dy[i];
+      int nextMirror = curMirrors + (Mirror[x][y][i] != i);
 
-      if(isInside(nx,ny) && miro[nx][ny] != '*' && (!visited[nx][ny][d] || ans[nx][ny] > nextChange)){
-        visited[nx][ny][d] = true;
-        ans[nx][ny] = nextChange;
+      if(isInside(nx,ny) && MAP[nx][ny] != '*'){
+        if(Mirror[nx][ny][i] > nextMirror){
+          Mirror[nx][ny][i] = nextMirror;
 
-        if(cur.dir == d) dq.push_front({nx,ny,d,cur.changed});
-        else dq.push_back({nx,ny,d,nextChange});
+          if(Mirror[x][y][i] == i){
+            dq.push_front({nextMirror,{nx,ny}});
+          }
+          else{
+            dq.push_back({nextMirror, {nx,ny}});
+          }
+        }
       }
     }
   }
-  return ans[endX][endY] == 1e9 ? -1 : ans[endX][endY];
+
+  int ans = 1e9;
+  for(int i = 0; i < 4; i++){
+    ans = min(ans, Mirror[endX][endY][i]);
+  }
+  return ans;
 }
 
-void solve(){
+void sol(){
+  init();
   getInput();
-  cout<<bfs();
+  cout<<bfs()<<'\n';
 }
 
 int main(){
@@ -80,6 +95,6 @@ int main(){
   cin.tie(nullptr);
   cout.tie(nullptr);
 
-  solve();
+  sol();
   return 0;
 }
