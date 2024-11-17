@@ -1,62 +1,62 @@
 #include <iostream>
-#include <queue>
 #include <vector>
+#include <queue>
 #include <algorithm>
 using namespace std;
 
 int n,m,k;
-bool visited[110][110] = {false};
-int miro[110][110] = {0};
-queue<pair<int,int>>q;
+vector<pair<int,int>>v;
+bool miro[110][110];
+bool visited[110][110];
 int dx[4] = {0,0,-1,1};
 int dy[4] = {-1,1,0,0};
-vector<int>v;
+int result = 0;
 
 bool isInside(int a, int b){
-  return (a>=1 && a <= n && b >= 1 && b <= m);
+  return(a>=1&&b>=1&&a<=n&&b<=m);
 }
 
-void getInput(){
-  cin>>m>>n>>k;
-  for(int i = 0; i < k; i++){
-    int a,b;
-    cin>>a>>b;
-    miro[a][b] = 1;
-  }
-}
-
-int bfs(int a, int b){
-  int size = 0;
+void bfs(int a, int b){
+  queue<pair<int,int>>q;
+  int cnt = 1;
+  visited[a][b] = true;
   q.push({a,b});
+
   while(!q.empty()){
     int x = q.front().first;
     int y = q.front().second;
-    if(visited[x][y])continue;
-    visited[x][y] = true;
     q.pop();
-    size++;
 
     for(int i = 0; i < 4; i++){
       int nx = x + dx[i];
       int ny = y + dy[i];
 
-      if(isInside(nx,ny) && !visited[nx][ny] && miro[nx][ny] == 1){
+      if(isInside(nx,ny) && miro[nx][ny] && !visited[nx][ny]){
         q.push({nx,ny});
+        visited[nx][ny] = true;
+        cnt++;
       }
     }
   }
-  return size;
+  result = max(result, cnt);
 }
 
-int solve(){
-  getInput();
-  for(int i = 0; i < n; i++){
-    for(int j = 0; j < m; j++){
-      if(!visited[i][j] && miro[i][j] == 1)v.push_back(bfs(i,j));
-    }
+void getInput(){
+  cin>>n>>m>>k;
+  int a,b;
+  for(int i = 0; i < k; i++){
+    cin>>a>>b;
+    v.push_back({a,b});
+    miro[a][b] = true;
   }
+}
 
-  return *max_element(v.begin(), v.end());
+void sol(){
+  getInput();
+  for(int i = 0; i < k; i++){
+    bfs(v[i].first, v[i].second);
+  }
+  cout<<result;
 }
 
 int main(){
@@ -64,5 +64,5 @@ int main(){
   cin.tie(nullptr);
   cout.tie(nullptr);
 
-  cout<<solve();
+  sol();
 }
