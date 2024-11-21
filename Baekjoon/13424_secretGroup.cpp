@@ -5,23 +5,21 @@
 using namespace std;
 
 int n,m,k,t;
-bool visited[110];
-int ans[110];
 vector<pair<int,int>>v[5005];
-priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
 vector<int>Friend;
 
+vector<int>dijkstra(int a);
+int findMid();
+
 void reset(){
-  fill(ans, ans+n+1, 1e9);
-  fill(visited, visited + n +1, false);
-  while(!pq.empty())pq.pop();
-  for(int i = 0; i <= m; i++) v[i].clear();
+  for(int i = 0; i <= n; i++)v[i].clear();
   Friend.clear();
 }
 
 void sol(){
   cin>>t;
   while(t--){
+    reset();
     cin>>n>>m;
     for(int i = 0; i < m; i++){
       int a,b,c;
@@ -35,34 +33,65 @@ void sol(){
       cin>>a;
       Friend.push_back(a); 
     }
-
+    cout<<findMid()<<'\n';
   }
 }
 
-void dijkstra(int a){
-  reset();
+vector<int> dijkstra(int a){
+  vector<int> ans(n+1, 1e9);
+  priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
+
   pq.push({0,a});
-  visited[a] = true;
+  ans[a] = 0;
 
   while(!pq.empty()){
     int value = pq.top().first;
     int node = pq.top().second;
     pq.pop();
 
+    if(value > ans[node])continue;
+
     for(int i = 0; i < v[node].size(); i++){
       int cost = v[node][i].first;
       int next = v[node][i].second;
 
-      if(!visited[next] && ans[next] > ans[node] + cost){
+      if(ans[next] > ans[node] + cost){
         ans[next] = ans[node] + cost;
-        visited[next] = true;
+        pq.push({ans[next], next});
       }
     }
   }
+  return ans;
 }
 
-void findMid(){
+int findMid(){
+  vector<int>totalDist(n+1, 0);
+
   for(int node : Friend){
-    
+    vector<int>dist = dijkstra(node);
+    for(int i = 1; i <= n; i++){
+      if(dist[i] != 1e9){
+        totalDist[i] += dist[i];
+      }
+    }
   }
+
+  int Min = 1e9;
+  int ansNode = -1;
+
+  for(int i = 1; i <= n; i++){
+    if(totalDist[i] < Min || totalDist[i] == Min && ansNode > i){
+      Min = totalDist[i];
+      ansNode = i;
+    }
+  }
+  return ansNode;
+}
+
+int main(){
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  cout.tie(nullptr);
+
+  sol();
 }
