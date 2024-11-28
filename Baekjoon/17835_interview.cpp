@@ -1,87 +1,68 @@
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <algorithm>
-#include <climits>
+#include <queue>
 using namespace std;
 using ll = long long;
 
-int n,m,k;
-vector<pair<ll,int>>v[500500];
-vector<int>interview;
+ll n, m,k,idx;
+vector<pair<ll,ll>> adj[100001];
+vector<ll> interview;
+ll dist[100001];
 
-void getInput(){
-  int a,b;
-  ll c;
+void intput(){
   cin>>n>>m>>k;
-  for(int i = 0; i < m; i++){
-    cin>>a>>b>>c;
-    v[a].push_back({c,b});
-    v[b].push_back({c,a});
+  ll u,v,c;
+  for(int i = 0; i < m; i ++){
+    cin>>u>>v>>c;
+    adj[v].push_back({c,u});
   }
   for(int i = 0; i < k; i++){
-    cin>>a;
-    interview.push_back(a);
+    cin>>u;
+    interview.push_back(u);
+  }
+  for(int i = 1; i <=n;i++){
+    dist[i] = 1e18;
   }
 }
 
-vector<ll> dijkstra(int start){
-  vector<ll>ans(n+1, LLONG_MIN);
-  priority_queue<pair<ll,int>>pq;
-  pq.push({0,start});
-  ans[start] = 0;
+void reverseDijkstra(){
+  ll max_cost = 0;
+  priority_queue<pair<ll,ll>,vector<pair<ll,ll>>,greater<pair<ll,ll>>> pq;
+  for(int i = 0; i < k; i++){
+    pq.push({0,interview[i]});
+    dist[interview[i]] = 0;
+  }
 
   while(!pq.empty()){
-    ll value = pq.top().first;
-    int node = pq.top().second;
+    ll node = pq.top().second;
+    ll value = pq.top().first;  
     pq.pop();
 
-    if(value < ans[node])continue;
+    if(dist[node] < value) continue;
+    for(int i = 0; i < adj[node].size(); i++){
+      ll next = adj[node][i].second;
+      ll cost = adj[node][i].first + value;
 
-    for(int i = 0; i < v[node].size(); i++){
-      ll cost = v[node][i].first;
-      int next = v[node][i].second;
-
-      if(ans[next] < ans[node] + cost){
-        ans[next] = ans[node] + cost;
-        pq.push({ans[next], next});
+      if(dist[next] > cost){
+        dist[next] = cost;
+        pq.push({cost,next});
       }
     }
   }
-
   for(int i = 1; i <= n; i++){
-    if(ans[i] == LLONG_MIN)ans[i] = 0;
-  }
-  return ans;
-}
-
-void sol(){
-  getInput();
-  vector<ll>ans = dijkstra(interview[0]);
-
-  for(int i = 1; i < interview.size(); i++){
-    vector<ll>compare = dijkstra(interview[i]);
-    for(int j = 1; j<= n; j++){
-      ans[j] = max(ans[j], compare[j]);
+    if(max_cost < dist[i]){
+      max_cost = dist[i];
+      idx = i;
     }
   }
-
-  ll maxDist = INT_MIN;
-  int minNode = -1;
-  for(int i = 1; i <= n; i++){
-    if(ans[i] > maxDist){
-      maxDist = ans[i];
-      minNode = i;
-    }
-    else if(ans[i] == maxDist && i < minNode) minNode = i;
-  }
-  cout<<maxDist<<'\n'<<minNode;
+  cout<<idx<<"\n"<<max_cost;
 }
 
 int main(){
-  ios::sync_with_stdio(false);
-  cin.tie(nullptr);
-  cout.tie(nullptr);
-
-  sol();
+  ios::sync_with_stdio(0);
+  cin.tie(0);
+  intput();
+  reverseDijkstra();
+  return 0;
 }
