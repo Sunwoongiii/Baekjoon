@@ -6,19 +6,15 @@
 using namespace std;
 
 int n,m,k;
-bool visited[1010][1010][11];
-int ans[1010][1010][11];
 char miro[1010][1010];
-int dx[4] = {0,0,-1,1};
-int dy[4] = {-1,1,0,0};
-queue<tuple<int,int,int,bool>>q;// x, y, 부순 벽 수, 낮&밤 구분
+bool visited[1010][1010][11];
+int dx[4] = {0,0,1,-1};
+int dy[4] = {1,-1,0,0};
 
-void getInput(){
+void getIput(){
   cin>>n>>m>>k;
   for(int i = 0; i < n; i++){
-    for(int j = 0; j < m; j++){
-      cin>>miro[i][j];
-    }
+    for(int j = 0; j < m; j++)cin>>miro[i][j];
   }
 }
 
@@ -26,70 +22,63 @@ bool isInside(int a, int b){
   return(a>=0&&b>=0&&a<n&&b<m);
 }
 
-int bfs(){
-  q.push({0,0,0,true});
-  visited[0][0][0] = true;
-  for(int i = 0; i <= k; i++)ans[0][0][i] = 1;
-  
+void BFS(int a, int b){
+  queue<pair<tuple<int,int,int>,pair<int,bool>>> q;
+  q.push({{a,b,1},{0, true}});
+  visited[a][b][0] = true;
+
   while(!q.empty()){
-    int x,y,smashedWall;
-    bool isDay;
-    tie(x,y,smashedWall,isDay) = q.front();
+    int x = get<0>(q.front().first);
+    int y = get<1>(q.front().first);
+    int cnt = get<2>(q.front().first);
+    int wall = q.front().second.first;
+    bool isDay = q.front().second.second;
     q.pop();
+
+    if(x == n-1 && y == m-1){
+      cout<<cnt;
+      return;
+    }
 
     for(int i = 0; i < 4; i++){
       int nx = x + dx[i];
       int ny = y + dy[i];
 
       if(isInside(nx,ny)){
-        if(miro[nx][ny] == '0' && !visited[nx][ny][smashedWall]){
-          ans[nx][ny][smashedWall] = ans[x][y][smashedWall] + 1;
-          visited[nx][ny][smashedWall] = true;
-          q.push({nx,ny,smashedWall, !isDay});
+        if(miro[nx][ny] == '0'){
+          if(visited[nx][ny][wall] == false){
+            visited[nx][ny][wall] = true;
+            q.push({{nx,ny,cnt+1},{wall, !isDay}});
+          }
         }
-
-        if(miro[nx][ny] == '1' && !visited[nx][ny][smashedWall+1] && smashedWall < k && isDay){
-          ans[nx][ny][smashedWall+1] = ans[x][y][smashedWall] + 1;
-          visited[nx][ny][smashedWall+1] = true;
-          q.push({nx,ny,smashedWall+1,!isDay});
-        }
-
-        if(miro[nx][ny] == '1' && !visited[nx][ny][smashedWall+1] && smashedWall < k && !isDay){
-          ans[x][y][smashedWall]++;
-          q.push({x,y,smashedWall, !isDay});
+        else if(miro[nx][ny] == '1'){
+          if(wall < k){
+            if(visited[nx][ny][wall+1] == false){
+              if(isDay){
+                visited[nx][ny][wall+1] = true;
+                q.push({{nx,ny,cnt+1},{wall+1, !isDay}});
+              }
+              else{
+                q.push({{x,y,cnt+1},{wall, !isDay}});
+              }
+            }
+          }
         }
       }
     }
   }
+  cout<<-1;
+}
 
-  int minMove = 1e9;// 최소이동거리 찾기
-  for(int i = 0; i <= k; i++){
-    if(ans[n-1][m-1][i] == 0) continue;
-    minMove = min(minMove, ans[n-1][m-1][i]);
-  }
-
-  return minMove == 1e9 ? -1 : minMove;
+void sol(){
+  getIput();
+  BFS(0,0);
 }
 
 int main(){
   ios::sync_with_stdio(false);
-  cin.tie(nullptr);
-  cout.tie(nullptr);
+  cin.tie(NULL);
+  cout.tie(NULL);
 
-  getInput();
-  cout<<bfs();
-
-  //디버깅용 씨발뭐가문제지
-  // cout<<bfs()<<"\n\n";
-
-  // for(int u = 0; u <= k; u++){
-  //   cout<<"Smashed wall: "<<u<<'\n';
-  //   for(int i = 0; i < n; i++){
-  //     for(int j = 0; j < m; j++){
-  //       cout<<ans[i][j][u]<<' ';
-  //     }
-  //     cout<<"\n";
-  //   }
-  //   cout<<"\n\n";
-  // }
+  sol();
 }
