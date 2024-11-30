@@ -55,7 +55,6 @@ int bfs() {
       }
 
       if (cell >= 'a' && cell <= 'z') {
-        // 키 발견 (키 상태 갱신)
         keys |= (1 << (cell - 'a'));
       }
 
