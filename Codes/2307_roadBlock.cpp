@@ -4,10 +4,10 @@
 #include <queue>
 using namespace std;
 
+int ans[1010];
 int N,M;
 vector<pair<int,int>>v[5050];
-int ans[1010];
-priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
+vector<int>path;
 
 void getInput(){
   cin>>N>>M;
@@ -19,21 +19,56 @@ void getInput(){
   }
 }
 
-int dijkstra(){
+int initialDijkstra(){
+  int parent[1010];
+  fill(parent, parent + N + 1, -1);
+  fill(ans, ans+N+1, 1e9); 
+  ans[1] = 0;
+  priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
+  pq.push({0,1});
+
+  while(!pq.empty()){
+    int node = pq.top().second;
+    int value = pq.top().first;
+    pq.pop();
+
+    if(ans[node] < value)continue;
+
+    for(int i = 0; i < v[node].size(); i++){
+      int next = v[node][i].second;
+      int cost = v[node][i].first;
+
+      if(ans[next] > value + cost){
+        ans[next] = value + cost;
+        parent[next] = node;
+        pq.push({ans[next], next});
+      }
+    }
+  }
+  for(int i = N; i != -1; i = parent[i]){
+    path.push_back(i);
+  }
+  reverse(path.begin(),path.end());
+  return ans[N] == 1e9 ? -1 : ans[N];
+}
+
+int dijkstra(int a, int b){
   fill(ans, ans+N+1, 1e9);
   ans[1] = 0;
+  priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
   pq.push({0,1});
-  
-  while(!pq.empty()){
-    int node = pq.top().first;
-    int value = pq.top().second;
 
-    if(value > ans[node])continue;
-    for(int i = 0; i < v[node].size(); i++){
+  while(!pq.empty()){
+    int value = pq.top().first;
+    int node = pq.top().second;
+    pq.pop();
+
+    for(int i = 0 ; i < v[node].size(); i++){
       int cost = v[node][i].first;
       int next = v[node][i].second;
 
-      if(ans[next] > value  + cost){
+      if((a == node && b == next) || (a == next && b == node))continue;
+      if(ans[next] > value + cost){
         ans[next] = value + cost;
         pq.push({ans[next], next});
       }
@@ -44,7 +79,26 @@ int dijkstra(){
 
 void sol(){
   getInput();
-  
+  int initialCost = initialDijkstra();
+  if(initialCost == -1){
+    cout<<-1;
+    return;
+  }
+
+  int dap = dijkstra(path[0], path[1]);
+  if(dap == -1){cout<<-1; return;}
+  dap -= initialCost;
+  for(int i = 1; i < path.size()-1; i++){
+    int to = path[i];
+    int go = path[i+1];
+
+    int blockedCost = dijkstra(to,go);
+    if(blockedCost == -1){cout<<-1; return;}
+    blockedCost-=initialCost;
+
+    dap = max(dap, blockedCost);
+  }
+  cout<<dap;
 }
 
 int main(){
@@ -52,5 +106,6 @@ int main(){
   cin.tie(nullptr);
   cout.tie(nullptr);
 
-
+  sol();
+  return 0;
 }
