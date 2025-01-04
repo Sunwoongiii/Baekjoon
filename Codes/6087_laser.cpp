@@ -1,93 +1,86 @@
 #include <iostream>
-#include <deque>
+#include <vector>
+#include <queue>
 #include <algorithm>
 using namespace std;
 
-int n,m;
-char MAP[101][101];
-int Mirror[101][101][4];
-int dx[4] = {0,0,-1,1};
-int dy[4] = {-1,1,0,0};
-int startX,startY,endX,endY;
+int n,m;//n:세로 m:가로
+char miro[101][101];
+int ans[101][101][4];//x,y,방향
+bool visited[101][101][4];//x,y,방향
+int dx[4]={0,0,1,-1};
+int dy[4]={1,-1,0,0};
+int sx,sy,ex,ey;
 
-void init(){
-  for(int i = 0; i < n; i++){
-    for(int j = 0; j < m; j++){
-      for(int k = 0; k < 4; k++){
-        Mirror[i][j][k] = 1e9;
-      }
-    }
-  }
-}
+class State{
+public:
+  int x,y,dir,changed;
+};
 
 void getInput(){
-  cin>>n>>m;
-  int cnt = 0;
-  for(int i = 0; i < n; i++){
-    for(int j = 0; j < m; j++){
-      cin>>MAP[i][j];
-      if(MAP[i][j] == 'C' && cnt == 0){
-        cnt++;
-        startX=i;
-        startY=j;
+  cin>>m>>n;
+  for(int i=0;i<n;i++){
+    for(int j=0;j<m;j++){
+      cin>>miro[i][j];
+      if(miro[i][j]=='C'){
+        if(sx==0&&sy==0){
+          sx=i;
+          sy=j;
+        }else{
+          ex=i;
+          ey=j;
+        }
       }
-      else if(MAP[i][j] == 'C' && cnt == 1){
-        endX=i;
-        endY=j;
+      for(int k=0;k<4;k++){
+        ans[i][j][k]=1e9;
       }
     }
   }
 }
 
-bool isInside(int a, int b){
-  return(a>=0&&b>=0&&a<n&&b<m);
+bool isInside(int x,int y){
+  return x>=0&&x<n&&y>=0&&y<m;
 }
 
 int bfs(){
-  deque<pair<int,pair<int,int>>>dq;
-
-  for(int i = 0; i < 4; i++){
-    dq.push_back({0,{startX,startY}});
-    Mirror[startX][startY][i] = 0;
+  queue<State> q;
+  for(int i=0;i<4;i++){
+    ans[sx][sy][i]=0;
+    visited[sx][sy][i]=true;
+    q.push({sx,sy,i,0});
   }
 
-  while(!dq.empty()){
-    auto[curMirrors, pos] = dq.front();
-    int x = pos.first;
-    int y = pos.second;
-    dq.pop_front();
+  while(!q.empty()){
+    State cur=q.front();
+    q.pop();
+    int x=cur.x;
+    int y=cur.y;
+    int dir=cur.dir;
+    int changed=cur.changed;
 
-    for(int i = 0; i < 4; i++){
-      int nx = x + dx[i];
-      int ny = y + dy[i];
-      int nextMirror = curMirrors + (Mirror[x][y][i] != i);
+    for(int d = 0; d < 4; d++){
+      int nx = x + dx[d];
+      int ny = y + dy[d];
+      int nextChange = changed + (dir != d);
 
-      if(isInside(nx,ny) && MAP[nx][ny] != '*'){
-        if(Mirror[nx][ny][i] > nextMirror){
-          Mirror[nx][ny][i] = nextMirror;
+      if(isInside(nx,ny) && miro[nx][ny] != '*' &&(!visited[nx][ny][d] || ans[nx][ny][d] > nextChange)){
+        visited[nx][ny][d] = true;
+        ans[nx][ny][d] = nextChange;
 
-          if(Mirror[x][y][i] == i){
-            dq.push_front({nextMirror,{nx,ny}});
-          }
-          else{
-            dq.push_back({nextMirror, {nx,ny}});
-          }
+        if(dir == d){
+          q.push({nx,ny,d,changed});
+        }
+        else{
+          q.push({nx,ny,d,nextChange});
         }
       }
     }
   }
-
-  int ans = 1e9;
+  int result = 1e9;
   for(int i = 0; i < 4; i++){
-    ans = min(ans, Mirror[endX][endY][i]);
+    result = min(result, ans[ex][ey][i]);
   }
-  return ans;
-}
-
-void sol(){
-  init();
-  getInput();
-  cout<<bfs()<<'\n';
+  return result;
 }
 
 int main(){
@@ -95,6 +88,24 @@ int main(){
   cin.tie(nullptr);
   cout.tie(nullptr);
 
-  sol();
-  return 0;
+  getInput();
+  cout<<bfs()<<'\n';
+
+  // for(int i = 0; i < n; i++){
+  //   for(int j = 0; j < m; j++){
+  //     cout<<miro[i][j]<<' ';
+  //   }
+  //   cout<<"\n\n";
+  // }
+
+  // for(int k = 0; k < 4; k++){
+  //   for(int i = 0; i < n; i++){
+  //     for(int j = 0; j < m; j++){
+  //       if(ans[i][j][k] == 1e9)cout<<"* ";
+  //       else cout<<ans[i][j][k]<<' ';
+  //     }
+  //     cout<<"\n";
+  //   }
+  //   cout<<"\n\n";
+  // }
 }
