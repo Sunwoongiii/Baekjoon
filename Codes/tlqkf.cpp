@@ -1,14 +1,23 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 int main(){
-  string str;
-  int len;
-  cin>>str;
-  len = str.length();
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  cout.tie(nullptr);
 
-  for(int i = 0; i < len; i++){
-    if(i % 10 == 0 && i != 0)cout<<'\n'<<str[i];
-    else cout<<str[i];
+  int N;
+  cin>>N;
+
+  int dp[100001];
+  for(int i = 0; i <= N; i++)dp[i] = i;
+
+  for(int i = 1; i <= N; i++){
+    for(int j = 1; j * j <= i; j++){
+      dp[i] = min(dp[i], dp[i-j*j]+1);
+    }
   }
+  cout<<dp[N];
 }
