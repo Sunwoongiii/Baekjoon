@@ -55,3 +55,17 @@ int initialDijkstra(){
 int pavementDijkstra(int to, int go, int cnt){
   
 }
+
+void sol(){
+  getInput();
+  int roadCnt = path.size();
+  int initial = initialDijkstra();
+
+  if(roadCnt <= K){
+    cout<<initial;
+    return;
+  }
+  else{
+    
+  }
+}
