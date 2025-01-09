@@ -6,7 +6,7 @@ using namespace std;
 
 int N,M,K;
 vector<pair<int,int>>v[50050];
-vector<int>path;
+vector<pair<int,int>>path;
 
 void getInput(){
   cin>>N>>M>>K;
@@ -21,8 +21,9 @@ void getInput(){
 int initialDijkstra(){
   int ans[N+1];
   int parent[N+1];
-  fill(parent, parent+N+1, -1);
   fill(ans, ans+N+1, 1e9);
+  fill(parent, parent + N + 1, -1);
+
   ans[1] = 0;
   priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
   pq.push({0,1});
@@ -33,12 +34,13 @@ int initialDijkstra(){
     pq.pop();
 
     if(ans[node] < value)continue;
+
     for(int i = 0; i < v[node].size(); i++){
       int cost = v[node][i].first;
       int next = v[node][i].second;
 
-      if(ans[next] > value + cost){
-        ans[next] = value + cost;
+      if(ans[next] > cost + value){
+        ans[next] = cost + value;
         parent[next] = node;
         pq.push({ans[next], next});
       }
@@ -46,14 +48,13 @@ int initialDijkstra(){
   }
 
   for(int node = N; node != -1; node = parent[node]){
-    path.push_back(node);
+    if(parent[node] != -1){
+      int weight = ans[node] - ans[parent[node]];
+      path.push_back({weight, node});
+    }
   }
   reverse(path.begin(), path.end());
   return ans[N];
-}
-
-int pavementDijkstra(int to, int go, int cnt){
-  
 }
 
 void sol(){
@@ -62,10 +63,27 @@ void sol(){
   int initial = initialDijkstra();
 
   if(roadCnt <= K){
-    cout<<initial;
+    cout<<initial<<'\n';
     return;
   }
   else{
-    
+    sort(path.begin(), path.end(), [](const pair<int,int>&a, const pair<int,int>&b){return a.first > b.first;});
+    int reduced = 0;
+    for(int i = 0; i < K; i++){
+      reduced += path[i].first;
+    }
+    cout<<reduced<<'\n';
+    return;
+  }
+}
+
+int main(){
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  cout.tie(nullptr);
+
+  sol();
+  for(int i = 0; i < path.size(); i++){
+    cout<<path[i].first<<' '<<path[i].second<<'\n';
   }
 }
