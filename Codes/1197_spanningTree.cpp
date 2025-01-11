@@ -1,44 +1,69 @@
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <algorithm>
+#include <tuple>
 using namespace std;
-using ll = long long;
 
-int V,e;
-vector<vector<int>>v;
+int parent[10001];
+vector<tuple<int,int,int>> v;
+int V,E,ans=0;
+
+int find(int x){
+  if(parent[x] == x) return x;
+  else return parent[x] = find(parent[x]);
+}
+
+void unite(int x, int y){
+  x = find(x);
+  y = find(y);
+
+  parent[y] = x;
+}
+
+bool UF(int x, int y){
+  x = find(x);
+  y = find(y);
+
+  return x == y ? true : false;
+}
 
 void getInput(){
-  cin>>V>>e;
-  
-  v.resize(n, vector<int>(n,0));
-  for(int i = 1; i <= V; i++){
-    for(int j = 1; j <= V; j++){
-      if(i == j)v[i][j] = 0;
-      else miro[i][j] = 1e9;
-    }
-  }
+  cin>>V>>E;
 
-  for(int i = 0; i < e; i++){
+  for(int i = 1; i <= V; i++)parent[i] = i;
+
+  for(int i = 0; i < E; i++){
     int a,b,c;
     cin>>a>>b>>c;
-    v[a][b] = c;
-    v[b][a] = c;
+    v.push_back({c,a,b});
+  }
+
+  sort(v.begin(), v.end());
+}
+
+void kruskal(){
+  for(const auto& edge : v){
+    int c = get<0>(edge);
+    int a = get<1>(edge);
+    int b = get<2>(edge);
+
+    if(!UF(a,b)){
+      unite(a,b);
+      ans+=c;
+    }
   }
 }
 
-void floydWarshall(){
-  for(int k = 1; k <= V; k++){
-    for(int i = 1; i <=V; k++){
-      for(int j = 1; j <=V; j++){
-        if(v[i][k] != 1e9 && v[k][j] != 1e9){
-          v[i][j] = min(v[i][j], v[i][k] + v[k][j]);
-        }
-      }
-    }
-  }
+void sol(){
+  getInput();
+  kruskal();
+  cout<<ans;
+}
 
-  for(int i = 1; i <= V; i++){
-    if(v[i][i] < 0)return;
-  }
+int main(){
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  cout.tie(nullptr);
+
+  sol();
 }
