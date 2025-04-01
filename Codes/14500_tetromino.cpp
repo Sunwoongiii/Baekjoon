@@ -1,52 +1,70 @@
 #include <iostream>
-#include <algorithm>
 using namespace std;
 
+int n, m, ans;
 int miro[505][505];
-int n, k;
+int visited[505][505];
+int dx[4] = {0, 0, -1, 1};
+int dy[4] = {-1, 1, 0, 0};
 
-void getInput() {
-  cin >> n >> k;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < k; j++) {
-      cin >> miro[i][j];
-    }
-  }
+bool isInside(int a, int b) {
+  return (a >= 1 && b >= 1 && a <= n && b <= m);
 }
 
-int tetromino(int a, int b) {
-  int res = 0;
+void dfs(int x, int y, int cnt, int val) {
+  if (cnt == 4) {
+    ans = max(ans, val);
+    return;
+  }
 
-  if (b + 3 < k) res = max(res, miro[a][b] + miro[a][b + 1] + miro[a][b + 2] + miro[a][b + 3]);
-  if (a + 3 < n) res = max(res, miro[a][b] + miro[a + 1][b] + miro[a + 2][b] + miro[a + 3][b]);
+  for (int i = 0; i < 4; i++) {
+    int nx = x + dx[i];
+    int ny = y + dy[i];
 
-  if (a + 1 < n && b + 1 < k) res = max(res, miro[a][b] + miro[a][b + 1] + miro[a + 1][b] + miro[a + 1][b + 1]);
-
-  if (a + 2 < n && b + 1 < k) res = max(res, miro[a][b] + miro[a + 1][b] + miro[a + 2][b] + miro[a][b + 1]);
-  if (a + 2 < n && b - 1 >= 0) res = max(res, miro[a][b] + miro[a + 1][b] + miro[a + 2][b] + miro[a][b - 1]);
-  if (a + 1 < n && b + 2 < k) res = max(res, miro[a][b] + miro[a][b + 1] + miro[a][b + 2] + miro[a + 1][b]);
-  if (a + 1 < n && b - 2 >= 0) res = max(res, miro[a][b] + miro[a][b - 1] + miro[a][b - 2] + miro[a + 1][b]);
-
-  if (a + 1 < n && b + 2 < k) res = max(res, miro[a][b] + miro[a][b + 1] + miro[a][b + 2] + miro[a + 1][b + 1]);
-  if (a + 2 < n && b + 1 < k) res = max(res, miro[a][b] + miro[a + 1][b] + miro[a + 2][b] + miro[a + 1][b + 1]);
-  if (a + 1 < n && b - 1 >= 0 && b + 1 < k) res = max(res, miro[a][b] + miro[a + 1][b] + miro[a][b - 1] + miro[a][b + 1]);
-  if (a - 1 >= 0 && b + 2 < k) res = max(res, miro[a][b] + miro[a][b + 1] + miro[a][b + 2] + miro[a - 1][b + 1]);
-
-  return res;
-}
-
-void sol() {
-  int ans = 0;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < k; j++) {
-      ans = max(ans, tetromino(i, j));
+    if (isInside(nx, ny) && !visited[nx][ny]) {
+      visited[nx][ny] = 1;
+      dfs(nx, ny, cnt + 1, val + miro[nx][ny]);
+      visited[nx][ny] = 0;
     }
   }
-  cout << ans;
 }
 
 int main() {
-  getInput();
-  sol();
-  return 0;
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  cout.tie(nullptr);
+
+  cin >> n >> m;
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= m; j++) {
+      cin >> miro[i][j];
+    }
+  }
+
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= m; j++) {
+      visited[i][j] = 1;
+      dfs(i, j, 1, miro[i][j]);
+      visited[i][j] = 0;
+    }
+  }
+
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= m; j++) {
+      int t = miro[i][j], mini = 10001, cnt = 0;
+      for (int k = 0; k < 4; k++) {
+        int nx = i + dx[k];
+        int ny = j + dy[k];
+
+        if (isInside(nx, ny)) {
+          mini = min(mini, miro[nx][ny]);
+          t += miro[nx][ny];
+          cnt++;
+        }
+      }
+      if (cnt == 4) t -= mini;
+      ans = max(ans, t);
+    }
+  }
+  cout << ans;
 }
